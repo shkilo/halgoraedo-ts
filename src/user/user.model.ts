@@ -1,11 +1,9 @@
-import { Column, Model, Table, PrimaryKey } from 'sequelize-typescript';
+import { Column, Model, Table, HasMany } from 'sequelize-typescript';
+import { Project } from '../project/project.model';
+import { Task } from '../task/task.model';
 
 @Table
 export class User extends Model<User> {
-  @PrimaryKey
-  @Column
-  id: string;
-
   @Column
   email: string;
 
@@ -14,4 +12,10 @@ export class User extends Model<User> {
 
   @Column
   provider: string;
+
+  @HasMany(() => Project)
+  project: Project[];
+
+  @HasMany(() => Task)
+  task: Task[];
 }
