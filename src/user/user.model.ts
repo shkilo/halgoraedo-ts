@@ -1,9 +1,10 @@
-import { Column, Model, Table, HasMany } from 'sequelize-typescript';
+import { Column, Model, Table, HasMany, Unique } from 'sequelize-typescript';
 import { Project } from '../project/project.model';
 import { Task } from '../task/task.model';
 
 @Table
 export class User extends Model<User> {
+  @Unique
   @Column
   email: string;
 
@@ -14,8 +15,8 @@ export class User extends Model<User> {
   provider: string;
 
   @HasMany(() => Project)
-  project: Project[];
+  projects: Project[];
 
   @HasMany(() => Task)
-  task: Task[];
+  tasks: Task[];
 }
