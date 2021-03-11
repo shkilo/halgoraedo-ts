@@ -13,7 +13,7 @@ import { Section } from './section.model';
 @Table
 export class Project extends Model<Project> {
   @AllowNull(false)
-  @Column
+  @Column({ defaultValue: '관리함' })
   title: string;
 
   @Column
@@ -34,5 +34,5 @@ export class Project extends Model<Project> {
   creator: User;
 
   @HasMany(() => Section)
-  section: Section[];
+  sections: Section[];
 }
