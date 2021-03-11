@@ -13,13 +13,13 @@ import { Task } from '../task/task.model';
 @Table
 export class Section extends Model<Section> {
   @AllowNull(false)
-  @Column
+  @Column({ defaultValue: '기본 섹션' })
   title: string;
 
   @Column
   color: string;
 
-  @Column
+  @Column({ defaultValue: 0 })
   position: number;
 
   @ForeignKey(() => Project)
@@ -30,5 +30,5 @@ export class Section extends Model<Section> {
   project: Project;
 
   @HasMany(() => Task)
-  task: Task[];
+  tasks: Task[];
 }
