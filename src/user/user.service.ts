@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Project } from 'src/project/project.model';
+import { ProjectService } from 'src/project/project.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.model';
+import { defaultProjectTitle } from './user.constants';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
+    private projectService: ProjectService,
   ) {}
 
   async findOrCreate(createUserDto: CreateUserDto): Promise<User> {
@@ -28,7 +30,7 @@ export class UserService {
     }
 
     const newUser = await user.save();
-    await newUser.$create('project', new Project());
+    await this.projectService.create(newUser, { title: defaultProjectTitle });
 
     return newUser;
   }
