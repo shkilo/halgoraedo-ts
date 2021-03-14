@@ -5,12 +5,13 @@ import {
   AllowNull,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { User } from '../user/user.model';
 import { Section } from '../project/section.model';
 
 @Table
-export class Task extends Model<Task> {
+export class Task extends Model {
   @AllowNull(false)
   @Column
   title: string;
@@ -39,4 +40,14 @@ export class Task extends Model<Task> {
 
   @BelongsTo(() => Section)
   section: Section;
+
+  @ForeignKey(() => Task)
+  @Column
+  parentId: number;
+
+  @BelongsTo(() => Task, 'parentId')
+  task: Task;
+
+  @HasMany(() => Task)
+  childTasks: Task[];
 }

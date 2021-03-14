@@ -11,7 +11,7 @@ import { User } from '../user/user.model';
 import { Section } from './section.model';
 
 @Table
-export class Project extends Model<Project> {
+export class Project extends Model {
   @AllowNull(false)
   @Column({ defaultValue: '관리함' })
   title: string;
