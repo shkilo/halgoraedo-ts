@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import sequelize from 'sequelize';
-import { EntityNotFoundException } from 'src/common/exceptions/buisness.exception';
-import { Task } from 'src/task/task.model';
-import { User } from 'src/user/user.model';
+import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
+import { Task } from '../task/task.model';
+import { User } from '../user/user.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './project.model';
@@ -118,7 +118,7 @@ export class ProjectService {
     return await project.update(projectData);
   }
 
-  async remove(user: User, id: string): Promise<void> {
+  async remove(user: User, id: number): Promise<void> {
     const result = await user.$get('projects', {
       where: {
         id,
