@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -12,7 +13,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { NotFoundInterceptor } from 'src/common/interceptors/not-found.interceptor';
+import { NotFoundInterceptor } from '../common/interceptors/not-found.interceptor';
+import { ValidationPipe } from '../common/pipes/validation.pipe';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './project.model';
@@ -26,7 +28,7 @@ export class ProjectController {
   @Post()
   async create(
     @Req() req: Request,
-    @Body() createProjectDto: CreateProjectDto,
+    @Body(ValidationPipe) createProjectDto: CreateProjectDto,
   ): Promise<Project> {
     return await this.projectService.create(req.user, createProjectDto);
   }
@@ -40,26 +42,25 @@ export class ProjectController {
   @UseInterceptors(new NotFoundInterceptor('project not found'))
   async findOne(
     @Req() req: Request,
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<Project> {
-    return await this.projectService.findOne(req.user, parseInt(id, 10));
+    return await this.projectService.findOne(req.user, id);
   }
 
   @Patch(':id')
   async update(
     @Req() req: Request,
-    @Param('id') id: string,
-    @Body() projectData: UpdateProjectDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) projectData: UpdateProjectDto,
   ): Promise<Project> {
-    return await this.projectService.update(
-      req.user,
-      parseInt(id, 10),
-      projectData,
-    );
+    return await this.projectService.update(req.user, id, projectData);
   }
 
   @Delete(':id')
-  remove(@Req() req: Request, @Param('id') id: string): Promise<void> {
+  remove(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
     return this.projectService.remove(req.user, id);
   }
 }
