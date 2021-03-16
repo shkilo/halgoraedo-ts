@@ -74,7 +74,6 @@ describe('ProjectService', () => {
 
   it('Find all project', async () => {
     const user = { id: 1 } as User;
-    user;
     expect(await service.findAll(user)).toEqual(foundProjects);
   });
 });
