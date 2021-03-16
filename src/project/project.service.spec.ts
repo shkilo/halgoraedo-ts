@@ -7,7 +7,7 @@ import { Section } from './section.model';
 import { Task } from '../task/task.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 
-const testProject = {
+const createdProject = {
   id: 1,
   title: '관리함',
   isList: true,
@@ -16,9 +16,21 @@ const testProject = {
   creatorId: 1,
 };
 
+const foundProjects = [
+  {
+    id: 71,
+    title: 'jaj',
+    color: '#000000',
+    isFavorite: false,
+    isList: true,
+    createdAt: '2021-03-16T14:57:24.000Z',
+    taskCount: 0,
+    defaultSectionId: 71,
+  },
+];
+
 describe('ProjectService', () => {
   let service: ProjectService;
-  // let user: User;
 
   beforeEach(async () => {
     const modRef = await Test.createTestingModule({
@@ -30,8 +42,9 @@ describe('ProjectService', () => {
             create: jest.fn(() => ({
               $set: () => undefined,
               $create: () => undefined,
-              save: () => testProject,
+              save: () => createdProject,
             })),
+            findAll: jest.fn(() => foundProjects),
           },
         },
         {
@@ -55,6 +68,13 @@ describe('ProjectService', () => {
       isFavorite: false,
       color: '#000000',
     };
-    expect(await service.create(user, dto)).toEqual(testProject);
+
+    expect(await service.create(user, dto)).toEqual(createdProject);
+  });
+
+  it('Find all project', async () => {
+    const user = { id: 1 } as User;
+
+    expect(await service.findAll(user)).toEqual(foundProjects);
   });
 });
