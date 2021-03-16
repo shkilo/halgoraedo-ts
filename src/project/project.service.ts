@@ -30,7 +30,7 @@ export class ProjectService {
   }
 
   async findAll(user: User): Promise<Project[]> {
-    return await user.$get('projects', {
+    return await this.projectModel.findAll({
       attributes: [
         'id',
         'title',
@@ -63,6 +63,9 @@ export class ProjectService {
         ['createdAt', 'ASC'],
         ['sections', 'position', 'ASC'],
       ],
+      where: {
+        creatorId: user.id,
+      },
     });
   }
 
