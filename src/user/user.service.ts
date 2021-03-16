@@ -1,35 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { ProjectService } from 'src/project/project.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.model';
+import { defaultProjectTitle } from './user.constants';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
+    private projectService: ProjectService,
   ) {}
 
-  create(createUserDto: CreateUserDto): Promise<User> {
+  async findOrCreate(createUserDto: CreateUserDto): Promise<User> {
     const user = new User();
-    user.id = createUserDto.id;
-    return user.save();
-  }
+    user.email = createUserDto.email;
+    user.name = createUserDto.name;
+    user.provider = createUserDto.provider;
 
-  async findAll(): Promise<User[]> {
-    return this.userModel.findAll();
-  }
-
-  findOne(id: string): Promise<User> {
-    return this.userModel.findOne({
+    const existingUser = await User.findOne({
       where: {
-        id,
+        email: user.email,
       },
     });
+
+    if (existingUser) {
+      return existingUser;
+    }
+
+    const newUser = await user.save();
+    await this.projectService.create(newUser, { title: defaultProjectTitle });
+
+    return newUser;
   }
 
-  async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await user.destroy();
+  async findOne(id: number): Promise<User> {
+    return await this.userModel.findByPk(id);
   }
 }

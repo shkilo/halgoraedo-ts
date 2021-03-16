@@ -1,29 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { User } from './user.model';
 import { UserService } from './user.service';
 
 @Controller('user')
+@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.userService.remove(id);
+  @Get('me')
+  findOne(@Req() req: Request): User {
+    return req.user;
   }
 }

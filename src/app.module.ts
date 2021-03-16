@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-// import { User } from './user/user.model';
 import { UserModule } from './user/user.module';
+import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { UserModule } from './user/user.module';
           : process.env.NODE_ENV === 'test'
           ? '.env.test'
           : '.env.dev',
+      isGlobal: true,
     }),
     SequelizeModule.forRoot({
       dialect: 'mysql',
@@ -24,11 +25,14 @@ import { UserModule } from './user/user.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadModels: true,
+      // sync: { force: true },
       synchronize: true,
     }),
     UserModule,
+    ProjectModule,
+    TaskModule,
+    AuthModule,
+    ConfigModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
