@@ -12,6 +12,8 @@ import { Section } from './section.model';
 @Injectable()
 export class ProjectService {
   constructor(
+    @InjectModel(Project)
+    private readonly projectModel: typeof Project,
     @InjectModel(Section)
     private readonly sectionModel: typeof Section,
     @InjectModel(Task)
@@ -19,10 +21,12 @@ export class ProjectService {
   ) {}
 
   async create(user: User, projectData: CreateProjectDto): Promise<Project> {
-    const newProject: Project = await user.$create('project', projectData);
-    await newProject.$create('section', {});
+    const newProject: Project = await this.projectModel.create(projectData);
 
-    return newProject;
+    newProject.$set('creator', user);
+    newProject.$create('section', {});
+
+    return await newProject.save();
   }
 
   async findAll(user: User): Promise<Project[]> {
