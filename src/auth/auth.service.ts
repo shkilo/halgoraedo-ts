@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Profile } from 'passport-google-oauth20';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -12,7 +11,6 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
   async validateGoogleUser(profile: Profile): Promise<User> {
