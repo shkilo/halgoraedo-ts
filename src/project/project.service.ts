@@ -1,32 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import sequelize from 'sequelize';
+import sequelize, { Sequelize } from 'sequelize';
 import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
 import { Task } from '../task/task.model';
 import { User } from '../user/user.model';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { UpdateSectionTaskPositionsDto } from './dto/update-section-task-positions.dto';
 import { Project } from './project.model';
 import { Section } from './section.model';
 
 @Injectable()
 export class ProjectService {
   constructor(
+    private readonly conn: Sequelize,
     @InjectModel(Project)
     private readonly projectModel: typeof Project,
     @InjectModel(Section)
     private readonly sectionModel: typeof Section,
-    @InjectModel(Task)
-    private readonly taskModel: typeof Task,
   ) {}
 
   async create(user: User, projectData: CreateProjectDto): Promise<Project> {
-    const newProject: Project = await this.projectModel.create(projectData);
+    return this.conn.transaction(async (t) => {
+      const transactionHost = { transaction: t };
 
-    newProject.$set('creator', user);
-    newProject.$create('section', {});
+      const newProject: Project = await this.projectModel.create(
+        projectData,
+        transactionHost,
+      );
+      await newProject.$set('creator', user, transactionHost);
+      await newProject.$create('section', {}, transactionHost);
 
-    return await newProject.save();
+      return newProject;
+    });
   }
 
   async findAll(user: User): Promise<Project[]> {
@@ -46,11 +53,11 @@ export class ProjectService {
       ],
       include: [
         {
-          model: this.sectionModel,
+          model: Section,
           attributes: [],
           include: [
             {
-              model: this.taskModel,
+              model: Task,
               required: false,
               attributes: [],
               where: { isDone: false, parentId: null },
@@ -70,17 +77,17 @@ export class ProjectService {
   }
 
   async findOne(user: User, id: number): Promise<Project> {
-    const result = await user.$get('projects', {
+    const project = await this.projectModel.findOne({
       attributes: ['id', 'title', 'isList'],
       include: {
-        model: this.sectionModel,
+        model: Section,
         include: [
           {
-            model: this.taskModel,
+            model: Task,
             where: { parentId: null },
             include: [
               {
-                model: this.taskModel,
+                model: Task,
                 as: 'childTasks',
               },
             ],
@@ -95,9 +102,9 @@ export class ProjectService {
       ],
       where: {
         id,
+        creatorId: user.id,
       },
     });
-    const project = result[0];
 
     if (!project) {
       throw new EntityNotFoundException();
@@ -111,32 +118,79 @@ export class ProjectService {
     id: number,
     projectData: UpdateProjectDto,
   ): Promise<Project> {
-    const result = await user.$get('projects', {
-      where: {
-        id,
-      },
-    });
-    const project = result[0];
-
-    if (!project) {
-      throw new EntityNotFoundException();
-    }
-
+    const project = await this.findOne(user, id);
     return await project.update(projectData);
   }
 
   async remove(user: User, id: number): Promise<void> {
-    const result = await user.$get('projects', {
-      where: {
-        id,
-      },
-    });
-    const project = result[0];
+    const project = await this.findOne(user, id);
+    return await project.destroy();
+  }
 
-    if (!project) {
+  async addSection(
+    user: User,
+    projectId: number,
+    sectionData: CreateSectionDto,
+  ) {
+    const project = await this.findOne(user, projectId);
+    const sections = await project.$get('sections');
+    const maxPosition = sections.reduce(
+      (maxPos, { position }) => Math.max(maxPos, position),
+      0,
+    );
+
+    return await project.$create('section', {
+      ...sectionData,
+      position: maxPosition + 1,
+    });
+  }
+
+  async findSection(user: User, projectId: number, sectionId: number) {
+    const project = await this.findOne(user, projectId);
+    const [section] = project.sections.filter(
+      (section) => section.id === sectionId,
+    );
+
+    if (!section) {
       throw new EntityNotFoundException();
     }
 
-    return await project.destroy();
+    return section;
+  }
+
+  async updateSection(
+    user: User,
+    projectId: number,
+    sectionId: number,
+    sectionData: CreateSectionDto,
+  ) {
+    const section = await this.findSection(user, projectId, sectionId);
+    return await section.update(sectionData);
+  }
+
+  async updateSectionTaskPositions(
+    user: User,
+    projectId: number,
+    sectionId: number,
+    positionData: UpdateSectionTaskPositionsDto,
+  ) {
+    const section = await this.findSection(user, projectId, sectionId);
+    const { orderedTasks } = positionData;
+
+    await this.conn.transaction(async (t) => {
+      const transactionHost = { transaction: t };
+
+      await Promise.all(
+        orderedTasks.map(async (id, position) => {
+          const [task] = await section.$get('tasks', { where: { id } });
+          await task.update({ position }, transactionHost);
+        }),
+      );
+    });
+  }
+
+  async removeSection(user: User, projectId: number, sectionId: number) {
+    const section = await this.findSection(user, projectId, sectionId);
+    return await section.destroy();
   }
 }
