@@ -4,10 +4,10 @@ import { Project } from './project.model';
 import { Section } from './section.model';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
-import { TaskModule } from 'src/task/task.module';
+import { TaskModule } from '../task/task.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Project, Section]), TaskModule],
+  imports: [SequelizeModule.forFeature([Project, Section])],
   providers: [ProjectService],
   controllers: [ProjectController],
   exports: [ProjectService],
