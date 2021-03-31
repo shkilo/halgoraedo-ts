@@ -15,6 +15,7 @@ jobs:
       DB_USER: test
       DB_PASSWORD: test
       DB_PORT: 3316
+      JWT_SECRET: test
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js 14.x
