@@ -9,6 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: 
+      DB_NAME: test
+      DB_HOST: localhost
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_PORT: 3316
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js 14.x
