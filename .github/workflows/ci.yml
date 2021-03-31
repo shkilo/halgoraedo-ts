@@ -15,6 +15,9 @@ jobs:
       DB_USER: test
       DB_PASSWORD: test
       DB_PORT: 3316
+      GOOGLE_CLIENT_ID: test
+      GOOGLE_CLIENT_SECRET: test
+      GOOGLE_CALLBACK_URL: test
       JWT_SECRET: test
     steps:
     - uses: actions/checkout@v2
