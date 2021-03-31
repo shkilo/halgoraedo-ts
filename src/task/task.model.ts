@@ -46,7 +46,7 @@ export class Task extends Model {
   parentId: number;
 
   @BelongsTo(() => Task, 'parentId')
-  task: Task;
+  parentTask: Task;
 
   @HasMany(() => Task)
   childTasks: Task[];

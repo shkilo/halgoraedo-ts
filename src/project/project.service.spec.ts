@@ -6,6 +6,9 @@ import { User } from '../user/user.model';
 import { Section } from './section.model';
 import { Task } from '../task/task.model';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
+import { NotFoundException } from '@nestjs/common';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 const createdProject = {
   id: 1,
@@ -29,6 +32,24 @@ const foundProjects = [
   },
 ];
 
+const foundOneProject = {
+  id: 1,
+  title: 'title',
+  isList: true,
+  sections: [
+    {
+      id: 12,
+      title: '기본 섹션',
+      color: null,
+      position: 0,
+      projectId: 12,
+      createdAt: '2021-03-15T08:39:33.000Z',
+      updatedAt: '2021-03-15T08:39:33.000Z',
+      tasks: [],
+    },
+  ],
+};
+
 describe('ProjectService', () => {
   let service: ProjectService;
 
@@ -45,6 +66,11 @@ describe('ProjectService', () => {
               save: () => createdProject,
             })),
             findAll: jest.fn(() => foundProjects),
+            findOne: jest.fn(({ where }) => {
+              return where.id === foundOneProject.id
+                ? { ...foundOneProject, update: () => undefined }
+                : null;
+            }),
           },
         },
         {
@@ -68,7 +94,6 @@ describe('ProjectService', () => {
       isFavorite: false,
       color: '#000000',
     };
-
     expect(await service.create(user, dto)).toEqual(createdProject);
   });
 
@@ -76,4 +101,29 @@ describe('ProjectService', () => {
     const user = { id: 1 } as User;
     expect(await service.findAll(user)).toEqual(foundProjects);
   });
+
+  it('Find one project by id', async () => {
+    const user = { id: 1 } as User;
+    const id = foundOneProject.id;
+    const idNotExisting = 404;
+
+    expect(await service.findOne(user, id)).toEqual(foundOneProject);
+    expect(
+      async () => await service.findOne(user, idNotExisting),
+    ).rejects.toThrow(EntityNotFoundException);
+  });
+
+  // it('Update project', async () => {
+  //   const user = { id: 1 } as User;
+  //   const id = createdProject.id;
+  //   const idNotExisting = 404;
+  //   const dto = {
+  //     color: '#0000000',
+  //   } as UpdateProjectDto;
+
+  //   expect(await service.update(user, id, dto)).toEqual(createdProject);
+  //   expect(
+  //     async () => await service.update(user, idNotExisting, dto),
+  //   ).rejects.toThrow(EntityNotFoundException);
+  // });
 });

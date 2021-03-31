@@ -20,7 +20,7 @@ const testProject = {
   creatorId: 1,
 };
 
-describe('CatsController', () => {
+describe('ProjectController', () => {
   let controller: ProjectController;
 
   beforeEach(async () => {

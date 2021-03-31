@@ -13,7 +13,6 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthCallback(@Req() req) {
-    const token = this.authService.getJwtToken(req.user);
-    console.log(token);
+    this.authService.getJwtToken(req.user);
   }
 }

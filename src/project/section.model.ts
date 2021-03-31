@@ -16,9 +16,6 @@ export class Section extends Model {
   @Column({ defaultValue: '기본 섹션' })
   title: string;
 
-  @Column
-  color: string;
-
   @Column({ defaultValue: 0 })
   position: number;
 

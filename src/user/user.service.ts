@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProjectService } from 'src/project/project.service';
+import { ProjectService } from '../project/project.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.model';
 import { defaultProjectTitle } from './user.constants';
