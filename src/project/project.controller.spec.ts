@@ -46,7 +46,6 @@ describe('ProjectController', () => {
   it('Create project', async () => {
     const dto: CreateProjectDto = {
       title: 'test',
-      color: '#FFFFFF',
     };
     expect(await controller.create(mockReq, dto)).toEqual(testProject);
   });
@@ -56,22 +55,21 @@ describe('ProjectController', () => {
   });
 
   it('Find one project by id', async () => {
-    const projectId = 1;
-    expect(await controller.findOne(mockReq, projectId)).toEqual(testProject);
+    expect(await controller.findOne(mockReq, testProject.id)).toEqual(
+      testProject,
+    );
   });
 
   it('Update project', async () => {
-    const projectId = 1;
     const dto: UpdateProjectDto = {
       title: 'test project',
     };
-    expect(await controller.update(mockReq, projectId, dto)).toEqual(
+    expect(await controller.update(mockReq, testProject.id, dto)).toEqual(
       testProject,
     );
   });
 
   it('Remove project', async () => {
-    const projectId = 1;
-    expect(await controller.remove(mockReq, projectId)).toBeNull();
+    expect(await controller.remove(mockReq, testProject.id)).toBeNull();
   });
 });

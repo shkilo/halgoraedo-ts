@@ -17,23 +17,17 @@ export class ProjectService {
     private readonly conn: Sequelize,
     @InjectModel(Project)
     private readonly projectModel: typeof Project,
-    @InjectModel(Section)
-    private readonly sectionModel: typeof Section,
   ) {}
 
   async create(user: User, projectData: CreateProjectDto): Promise<Project> {
-    return this.conn.transaction(async (t) => {
-      const transactionHost = { transaction: t };
-
-      const newProject: Project = await this.projectModel.create(
-        projectData,
-        transactionHost,
-      );
-      await newProject.$set('creator', user, transactionHost);
-      await newProject.$create('section', {}, transactionHost);
-
-      return newProject;
-    });
+    return await this.projectModel.create(
+      {
+        ...projectData,
+        creatorId: user.id,
+        sections: [{}],
+      },
+      { include: Section },
+    );
   }
 
   async findAll(user: User): Promise<Project[]> {
@@ -133,8 +127,7 @@ export class ProjectService {
     sectionData: CreateSectionDto,
   ) {
     const project = await this.findOne(user, projectId);
-    const sections = await project.$get('sections');
-    const maxPosition = sections.reduce(
+    const maxPosition = project.sections.reduce(
       (maxPos, { position }) => Math.max(maxPos, position),
       0,
     );
@@ -147,9 +140,7 @@ export class ProjectService {
 
   async findSection(user: User, projectId: number, sectionId: number) {
     const project = await this.findOne(user, projectId);
-    const [section] = project.sections.filter(
-      (section) => section.id === sectionId,
-    );
+    const section = project.sections.find(({ id }) => id === sectionId);
 
     if (!section) {
       throw new EntityNotFoundException();
