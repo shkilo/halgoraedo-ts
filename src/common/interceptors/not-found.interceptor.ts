@@ -11,7 +11,7 @@ import { EntityNotFoundException } from '../exceptions/buisness.exception';
 
 @Injectable()
 export class NotFoundInterceptor implements NestInterceptor {
-  constructor(private errorMessage: string) {}
+  constructor(private errorMessage: string = 'not found') {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(

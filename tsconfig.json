@@ -11,8 +11,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "paths": {
-      "sequelize": ["src/@types/sequelize"]
-    }
+    // "paths": {
+    //   "sequelize": ["src/@types/sequelize"]
+    // }
   }
 }
