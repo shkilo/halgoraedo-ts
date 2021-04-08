@@ -15,7 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { NotFoundInterceptor } from '../common/interceptors/not-found.interceptor';
 import { ValidationPipe } from '../common/pipes/validation.pipe';
-import { CreateTaskDto } from './dto/creat-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-taske.dto';
 import { Task } from './task.model';
 
