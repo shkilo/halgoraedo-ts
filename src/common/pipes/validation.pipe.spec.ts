@@ -4,7 +4,7 @@ import { CreateProjectDto } from '../../project/dto/create-project.dto';
 
 const failString = 'should throw an error for incorrect type';
 
-describe('CatPipe', () => {
+describe('Validation Pipe', () => {
   let pipe: ValidationPipe;
 
   beforeEach(() => {
@@ -29,8 +29,8 @@ describe('CatPipe', () => {
       });
     });
     describe('unsuccessful calls', () => {
-      describe('age errors', () => {
-        it('should throw an error for missing age', async () => {
+      describe('title errors', () => {
+        it('should throw an error for missing title', async () => {
           dto.title = undefined as any;
           const errorPipe = () => pipe.transform(dto, mockMetadata);
           await expect(errorPipe).rejects.toBeInstanceOf(BadRequestException);
@@ -41,21 +41,21 @@ describe('CatPipe', () => {
           await expect(errorPipe).rejects.toBeInstanceOf(BadRequestException);
         });
       });
-      describe('name errors', () => {
+      describe('color errors', () => {
         it(failString, async () => {
           dto.color = '#??????' as any;
           const errorPipe = () => pipe.transform(dto, mockMetadata);
           await expect(errorPipe).rejects.toBeInstanceOf(BadRequestException);
         });
       });
-      describe('breed errors', () => {
+      describe('isList errors', () => {
         it(failString, async () => {
           dto.isList = '?' as any;
           const errorPipe = () => pipe.transform(dto, mockMetadata);
           await expect(errorPipe).rejects.toBeInstanceOf(BadRequestException);
         });
       });
-      describe('breed errors', () => {
+      describe('isFavorite errors', () => {
         it(failString, async () => {
           dto.isFavorite = '?' as any;
           const errorPipe = () => pipe.transform(dto, mockMetadata);
