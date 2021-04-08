@@ -207,7 +207,6 @@ describe('AppController (e2e)', () => {
         .expect(({ body }) => {
           expect(body.title).toBe(dto.title);
           testSection = body;
-          console.log(testSection);
         });
     });
 
