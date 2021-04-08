@@ -1,41 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProjectService } from '../project/project.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.model';
-import { defaultProjectTitle } from './user.constants';
+import { Project } from '../project/project.model';
+import { InvalidOptionException } from '../common/exceptions/buisness.exception';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User)
-    private userModel: typeof User,
-    private projectService: ProjectService,
+    private readonly userModel: typeof User,
   ) {}
 
-  async findOrCreate(createUserDto: CreateUserDto): Promise<User> {
-    const user = new User();
-    user.email = createUserDto.email;
-    user.name = createUserDto.name;
-    user.provider = createUserDto.provider;
+  async findOne(
+    key: number | string,
+    option: { by: 'id' | 'email' },
+  ): Promise<User> {
+    if (
+      (option.by === 'id' && typeof key === 'string') ||
+      (option.by === 'email' && typeof key === 'number')
+    ) {
+      throw new InvalidOptionException();
+    }
 
-    const existingUser = await User.findOne({
-      where: {
-        email: user.email,
-      },
-    });
+    return option.by === 'id'
+      ? await this.userModel.findByPk(key)
+      : await this.userModel.findOne({
+          where: {
+            email: key,
+          },
+        });
+  }
+
+  async findOrCreate(userData: CreateUserDto): Promise<User> {
+    const existingUser = await this.findOne(userData.email, { by: 'email' });
 
     if (existingUser) {
       return existingUser;
     }
 
-    const newUser = await user.save();
-    await this.projectService.create(newUser, { title: defaultProjectTitle });
-
-    return newUser;
-  }
-
-  async findOne(id: number): Promise<User> {
-    return await this.userModel.findByPk(id);
+    return this.userModel.create(
+      { ...userData, projects: [{}] },
+      { include: [Project] },
+    );
   }
 }
