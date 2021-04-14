@@ -69,23 +69,19 @@ describe('ProjectService', () => {
     };
     expect(await service.create(user, dto)).toEqual(testProject);
   });
-
   it('Find all project', async () => {
     expect(await service.findAll(user)).toEqual([testProject]);
   });
-
   it('Find one project by id', async () => {
     const id = testProject.id;
 
     // id existing
     expect(await service.findOne(user, id)).toEqual(testProject);
-
     // id not existing
     await expect(service.findOne(user, idNotExisting)).rejects.toBeInstanceOf(
       EntityNotFoundException,
     );
   });
-
   it('Update a project', async () => {
     const id = testProject.id;
     const dto: UpdateProjectDto = {
@@ -100,7 +96,6 @@ describe('ProjectService', () => {
     jest.spyOn(service, 'findOne').mockImplementation(() => projectInstace);
     expect(await service.update(user, id, dto)).toEqual(testProject);
   });
-
   it('Delete a project', async () => {
     const projectInstace: any = {
       destroy: jest.fn(() => undefined),
@@ -109,7 +104,6 @@ describe('ProjectService', () => {
     jest.spyOn(service, 'findOne').mockImplementation(() => projectInstace);
     expect(await service.remove(user, testProject.id)).toBeUndefined();
   });
-
   it('Add a section to a project', async () => {
     const dto: CreateSectionDto = {
       title: 'test',
@@ -131,7 +125,6 @@ describe('ProjectService', () => {
       position: maxPosition + 1,
     });
   });
-
   it('Find a section', async () => {
     const section = testProject.sections[0];
 
@@ -143,7 +136,6 @@ describe('ProjectService', () => {
       service.findSection(user, testProject.id, idNotExisting),
     ).rejects.toBeInstanceOf(EntityNotFoundException);
   });
-
   it('Update a section', async () => {
     const dto: UpdateSectionDto = { title: 'update' };
     const updatedSection = { title: 'update' };
@@ -161,7 +153,6 @@ describe('ProjectService', () => {
       updatedSection,
     );
   });
-
   it('Delete a section', async () => {
     const sectionInstance: any = {
       destroy: jest.fn(() => undefined),
@@ -175,7 +166,6 @@ describe('ProjectService', () => {
       await service.removeSection(user, testProject.id, 1),
     ).toBeUndefined();
   });
-
   // it('Update positions of task in a section', async () => {
   //   const dto: UpdateSectionDto = { title: 'update' };
   //   const updatedSection = { title: 'update' };

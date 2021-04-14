@@ -8,13 +8,10 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
-import { CreateUserDto } from '../src/user/dto/create-user.dto';
-import { User } from '../src/user/user.model';
 import { Project } from '../src/project/project.model';
 import { Section } from '../src/project/section.model';
 import { Task } from '../src/task/task.model';
 import { CreateProjectDto } from '../src/project/dto/create-project.dto';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { UpdateProjectDto } from '../src/project/dto/update-project.dto';
 import { CreateSectionDto } from '../src/project/dto/create-section.dto';
 import { UpdateSectionDto } from '../src/project/dto/update-section.dto';
@@ -67,14 +64,12 @@ describe('AppController (e2e)', () => {
           testProject = body;
         });
     });
-
     it('404 for id not existing', () => {
       return request(app.getHttpServer())
         .get(`/project/${idNotExisting}`)
         .set('authorization', token)
         .expect(HttpStatus.NOT_FOUND);
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .get(`/project/${idFirst}`)
@@ -96,7 +91,6 @@ describe('AppController (e2e)', () => {
           ).toBeTruthy();
         });
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .get('/project')
@@ -113,7 +107,6 @@ describe('AppController (e2e)', () => {
     const dtoBadTitle = {
       title: 1,
     };
-
     it('should return created project with id', () => {
       return request(app.getHttpServer())
         .post('/project')
@@ -124,7 +117,6 @@ describe('AppController (e2e)', () => {
           expect(res.body.title).toBe(dto.title);
         });
     });
-
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
         .post('/project')
@@ -132,7 +124,6 @@ describe('AppController (e2e)', () => {
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .post('/project')
@@ -162,7 +153,6 @@ describe('AppController (e2e)', () => {
           expect(body.title).toBe(dto.title);
         });
     });
-
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
         .patch(`/project/${testProject.id}`)
@@ -170,7 +160,6 @@ describe('AppController (e2e)', () => {
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .patch(`/project/${testProject.id}`)
@@ -178,7 +167,6 @@ describe('AppController (e2e)', () => {
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-
     it('404 for id not existing', () => {
       return request(app.getHttpServer())
         .patch(`/project/${idNotExisting}`)
@@ -207,10 +195,8 @@ describe('AppController (e2e)', () => {
         .expect(({ body }) => {
           expect(body.title).toBe(dto.title);
           testSection = body;
-          console.log(testSection);
         });
     });
-
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
         .post(`/project/${testProject.id}/section`)
@@ -218,7 +204,6 @@ describe('AppController (e2e)', () => {
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .post(`/project/${testProject.id}/section`)
@@ -226,7 +211,6 @@ describe('AppController (e2e)', () => {
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-
     it('404 for project id not existing', () => {
       return request(app.getHttpServer())
         .post(`/project/${idNotExisting}/section`)
@@ -256,7 +240,6 @@ describe('AppController (e2e)', () => {
           expect(body.title).toBe(dto.title);
         });
     });
-
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
         .patch(`/project/${testProject.id}/section/${testSection.id}`)
@@ -264,7 +247,6 @@ describe('AppController (e2e)', () => {
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
-
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
         .patch(`/project/${testProject.id}/section/${testSection.id}`)
@@ -272,7 +254,6 @@ describe('AppController (e2e)', () => {
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-
     it('404 for section id not existing', () => {
       return request(app.getHttpServer())
         .patch(`/project/${testProject.id}/section/${sectionIdNotExisting}`)

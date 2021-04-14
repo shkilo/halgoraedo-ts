@@ -4,14 +4,12 @@ import { ProjectService } from '../project/project.service';
 import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
 import { Task } from './task.model';
 import { User } from '../user/user.model';
-import { CreateTaskDto } from './dto/creat-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-taske.dto';
-import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class TaskService {
   constructor(
-    private readonly conn: Sequelize,
     private readonly projectService: ProjectService,
     @InjectModel(Task)
     private readonly taskModel: typeof Task,
@@ -30,20 +28,11 @@ export class TaskService {
       0,
     );
 
-    return await this.conn.transaction(async (t) => {
-      const transactionHost = { transaction: t };
-
-      const newTask = await this.taskModel.create(
-        {
-          ...taskData,
-          position: maxPostion + 1,
-        },
-        transactionHost,
-      );
-      await newTask.$set('section', section, transactionHost);
-      await newTask.$set('creator', user, transactionHost);
-
-      return newTask;
+    return await this.taskModel.create({
+      ...taskData,
+      position: maxPostion + 1,
+      creatorId: user.id,
+      sectionId: section.id,
     });
   }
 

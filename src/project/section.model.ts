@@ -9,11 +9,12 @@ import {
 } from 'sequelize-typescript';
 import { Project } from './project.model';
 import { Task } from '../task/task.model';
+import { defaultSectionTitle } from '../common/constants';
 
 @Table
 export class Section extends Model {
   @AllowNull(false)
-  @Column({ defaultValue: '기본 섹션' })
+  @Column({ defaultValue: defaultSectionTitle })
   title: string;
 
   @Column({ defaultValue: 0 })

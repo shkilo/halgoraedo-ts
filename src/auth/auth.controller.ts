@@ -1,5 +1,6 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -12,7 +13,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  googleAuthCallback(@Req() req) {
+  googleAuthCallback(@Req() req: Request) {
     this.authService.getJwtToken(req.user);
   }
 }

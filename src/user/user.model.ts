@@ -3,7 +3,7 @@ import { Project } from '../project/project.model';
 import { Task } from '../task/task.model';
 
 @Table
-export class User extends Model<User> {
+export class User extends Model {
   @Unique
   @Column
   email: string;
