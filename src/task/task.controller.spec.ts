@@ -5,21 +5,21 @@ import { TaskService } from './task.service';
 
 const mockReq = {
   user: {
-    id: 1,
+    id: 'uuid',
   },
 } as Request;
 const testTasks = [
   {
-    id: 1,
+    id: 'uuid1',
     position: 0,
   },
   {
-    id: 2,
+    id: 'uuid2',
     position: 1,
   },
 ];
 const newTask = {
-  id: 3,
+  id: 'uuid3',
   title: 'test',
   position: 2,
 };
@@ -54,7 +54,7 @@ describe('ProjectController', () => {
     expect(await controller.create(mockReq, dto)).toEqual(newTask);
   });
   it('Find all projects', async () => {
-    expect(await controller.findAll(mockReq)).toEqual(testTasks);
+    expect(await controller.findAll(mockReq)).toEqual({ tasks: testTasks });
   });
   it('Find one project by id', async () => {
     expect(await controller.findOne(mockReq, testTasks[0].id)).toEqual(
