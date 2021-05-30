@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Project } from './project.model';
-import { Section } from './section.model';
+import { Project } from './models/project.model';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
-import { TaskModule } from '../task/task.module';
+import { Section } from './models/section.model';
 
 @Module({
   imports: [SequelizeModule.forFeature([Project, Section])],

@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import sequelize, { Sequelize } from 'sequelize';
 import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
-import { Task } from '../task/task.model';
+import { Task } from '../task/models/task.model';
 import { User } from '../user/user.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UpdateSectionTaskPositionsDto } from './dto/update-section-task-positions.dto';
-import { Project } from './project.model';
-import { Section } from './section.model';
+import { Project } from './models/project.model';
+import { Section } from './models/section.model';
 
 @Injectable()
 export class ProjectService {
@@ -70,7 +70,7 @@ export class ProjectService {
     });
   }
 
-  async findOne(user: User, id: number): Promise<Project> {
+  async findOne(user: User, id: string): Promise<Project> {
     const project = await this.projectModel.findOne({
       attributes: ['id', 'title', 'isList'],
       include: {
@@ -79,12 +79,7 @@ export class ProjectService {
           {
             model: Task,
             where: { parentId: null },
-            include: [
-              {
-                model: Task,
-                as: 'childTasks',
-              },
-            ],
+            include: ['tasks'],
             required: false,
           },
         ],
@@ -92,7 +87,7 @@ export class ProjectService {
       order: [
         ['sections', 'position', 'ASC'],
         ['sections', 'tasks', 'position', 'ASC'],
-        ['sections', 'tasks', 'childTasks', 'position', 'ASC'],
+        ['sections', 'tasks', 'tasks', 'position', 'ASC'],
       ],
       where: {
         id,
@@ -109,21 +104,21 @@ export class ProjectService {
 
   async update(
     user: User,
-    id: number,
+    id: string,
     projectData: UpdateProjectDto,
   ): Promise<Project> {
     const project = await this.findOne(user, id);
     return await project.update(projectData);
   }
 
-  async remove(user: User, id: number): Promise<void> {
+  async remove(user: User, id: string): Promise<void> {
     const project = await this.findOne(user, id);
     return await project.destroy();
   }
 
   async addSection(
     user: User,
-    projectId: number,
+    projectId: string,
     sectionData: CreateSectionDto,
   ) {
     const project = await this.findOne(user, projectId);
@@ -138,7 +133,7 @@ export class ProjectService {
     });
   }
 
-  async findSection(user: User, projectId: number, sectionId: number) {
+  async findSection(user: User, projectId: string, sectionId: string) {
     const project = await this.findOne(user, projectId);
     const section = project.sections.find(({ id }) => id === sectionId);
 
@@ -151,8 +146,8 @@ export class ProjectService {
 
   async updateSection(
     user: User,
-    projectId: number,
-    sectionId: number,
+    projectId: string,
+    sectionId: string,
     sectionData: CreateSectionDto,
   ) {
     const section = await this.findSection(user, projectId, sectionId);
@@ -161,26 +156,24 @@ export class ProjectService {
 
   async updateSectionTaskPositions(
     user: User,
-    projectId: number,
-    sectionId: number,
+    projectId: string,
+    sectionId: string,
     positionData: UpdateSectionTaskPositionsDto,
   ) {
     const section = await this.findSection(user, projectId, sectionId);
     const { orderedTasks } = positionData;
 
     await this.conn.transaction(async (t) => {
-      const transactionHost = { transaction: t };
-
       await Promise.all(
         orderedTasks.map(async (id, position) => {
           const [task] = await section.$get('tasks', { where: { id } });
-          await task.update({ position }, transactionHost);
+          await task.update({ position, parentId: null }, { transaction: t });
         }),
       );
     });
   }
 
-  async removeSection(user: User, projectId: number, sectionId: number) {
+  async removeSection(user: User, projectId: string, sectionId: string) {
     const section = await this.findSection(user, projectId, sectionId);
     return await section.destroy();
   }
