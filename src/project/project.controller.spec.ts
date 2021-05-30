@@ -7,12 +7,12 @@ import { ProjectService } from './project.service';
 
 const mockReq = {
   user: {
-    id: 1,
+    id: 'id',
   },
 } as Request;
 
 const testProject = {
-  id: 1,
+  id: 'id',
   title: 'test project',
   isList: true,
   color: '#FFFFFF',
@@ -51,13 +51,15 @@ describe('ProjectController', () => {
   });
 
   it('Find all projects', async () => {
-    expect(await controller.findAll(mockReq)).toEqual([testProject]);
+    expect(await controller.findAll(mockReq)).toEqual({
+      projectInfos: [testProject],
+    });
   });
 
   it('Find one project by id', async () => {
-    expect(await controller.findOne(mockReq, testProject.id)).toEqual(
-      testProject,
-    );
+    expect(await controller.findOne(mockReq, testProject.id)).toEqual({
+      project: testProject,
+    });
   });
 
   it('Update project', async () => {
