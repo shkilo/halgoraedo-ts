@@ -6,13 +6,21 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  IsUUID,
+  PrimaryKey,
 } from 'sequelize-typescript';
+import Sequelize from 'sequelize';
 import { Project } from './project.model';
-import { Task } from '../task/task.model';
-import { defaultSectionTitle } from '../common/constants';
+import { Task } from '../../task/models/task.model';
+import { defaultSectionTitle } from '../../common/constants';
 
-@Table
+@Table({ tableName: 'section' })
 export class Section extends Model {
+  @IsUUID(4)
+  @PrimaryKey
+  @Column({ defaultValue: Sequelize.UUIDV4 })
+  id: string;
+
   @AllowNull(false)
   @Column({ defaultValue: defaultSectionTitle })
   title: string;
@@ -22,7 +30,7 @@ export class Section extends Model {
 
   @ForeignKey(() => Project)
   @Column
-  projectId: number;
+  projectId: string;
 
   @BelongsTo(() => Project)
   project: Project;
