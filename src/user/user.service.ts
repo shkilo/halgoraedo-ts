@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.model';
-import { Project } from '../project/project.model';
-import { InvalidOptionException } from '../common/exceptions/buisness.exception';
+import { Project } from '../project/models/project.model';
 
 @Injectable()
 export class UserService {
@@ -12,17 +11,7 @@ export class UserService {
     private readonly userModel: typeof User,
   ) {}
 
-  async findOne(
-    key: number | string,
-    option: { by: 'id' | 'email' },
-  ): Promise<User> {
-    if (
-      (option.by === 'id' && typeof key === 'string') ||
-      (option.by === 'email' && typeof key === 'number')
-    ) {
-      throw new InvalidOptionException();
-    }
-
+  async findOne(key: string, option: { by: 'id' | 'email' }): Promise<User> {
     return option.by === 'id'
       ? await this.userModel.findByPk(key)
       : await this.userModel.findOne({

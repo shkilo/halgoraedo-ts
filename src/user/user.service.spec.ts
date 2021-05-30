@@ -5,13 +5,13 @@ import { InvalidOptionException } from '../common/exceptions/buisness.exception'
 import { UserService } from './user.service';
 
 const testUser = {
-  id: 1,
+  id: 'uuid',
   name: 'test',
   email: 'test@test',
   provider: 'test',
 };
 const userDto = {
-  id: 1,
+  id: 'uuid',
   email: 'test@test',
 } as any;
 
@@ -40,13 +40,6 @@ describe('ProjectService', () => {
     expect(await service.findOne(userDto.email, { by: 'email' })).toEqual(
       testUser,
     );
-    // should throw error for a bad option
-    await expect(
-      service.findOne(userDto.email, { by: 'id' }),
-    ).rejects.toBeInstanceOf(InvalidOptionException);
-    await expect(
-      service.findOne(userDto.id, { by: 'email' }),
-    ).rejects.toBeInstanceOf(InvalidOptionException);
   });
   it('Find or create user', async () => {
     expect(await service.findOrCreate(userDto)).toEqual(testUser);

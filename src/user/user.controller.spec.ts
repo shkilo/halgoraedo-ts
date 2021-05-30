@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 
 const mockReq = {
   user: {
-    id: 1,
+    id: 'uuid',
   },
 } as any;
 
@@ -19,6 +19,6 @@ describe('ProjectController', () => {
   });
 
   it('Create project', () => {
-    expect(controller.me(mockReq)).toEqual(mockReq.user);
+    expect(controller.me(mockReq)).toEqual({ user: mockReq.user });
   });
 });
