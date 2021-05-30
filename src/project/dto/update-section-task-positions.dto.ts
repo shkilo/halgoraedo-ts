@@ -1,6 +1,6 @@
-import { IsNumber } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
 export class UpdateSectionTaskPositionsDto {
-  @IsNumber({}, { each: true })
-  readonly orderedTasks: number[];
+  @IsUUID(4, { each: true })
+  readonly orderedTasks: string[];
 }
