@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { AuthModule } from './auth/auth.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { AuthModule } from './auth/auth.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadModels: true,
-      // sync: { force: true },
+      // sync: { alter: true },
       synchronize: true,
     }),
     UserModule,
@@ -34,5 +35,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     ConfigModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
