@@ -24,7 +24,7 @@ export class AuthService {
     return user;
   }
 
-  getJwtToken(user: User) {
+  getJwtToken(user: User): string {
     const payload: JwtUserPayload = {
       id: user.id,
       email: user.email,

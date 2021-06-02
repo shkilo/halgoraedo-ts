@@ -1,27 +1,27 @@
 import {
+  IsBoolean,
   IsISO8601,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
   MinLength,
 } from 'class-validator';
 
-export class CreateTaskDto {
+export class UpdateTaskDto {
+  @IsOptional()
   @MinLength(1)
   @IsString()
   readonly title: string;
 
+  @IsOptional()
   @IsISO8601()
   readonly dueDate: Date;
 
-  @IsUUID(4)
-  readonly projectId: string;
-
-  @IsUUID(4)
-  readonly sectionId: string;
+  @IsOptional()
+  @IsBoolean()
+  readonly isDone: boolean;
 
   @IsOptional()
-  @IsUUID(4)
-  readonly parentId: string;
+  @IsUUID()
+  readonly sectionId: string;
 }

@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/sequelize';
 import { ProjectService } from './project.service';
-import { Project } from './project.model';
+import { Project } from './models/project.model';
 import { User } from '../user/user.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
@@ -10,10 +10,10 @@ import { Sequelize } from 'sequelize';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 
-const user = { id: 1 } as User;
-const idNotExisting = 404;
+const user = { id: 'uuid' } as User;
+const idNotExisting = '404';
 const testProject = {
-  id: 1,
+  id: 'uuid',
   title: '관리함',
   isList: true,
   isFavorite: false,
@@ -21,7 +21,7 @@ const testProject = {
   creatorId: 1,
   sections: [
     {
-      id: 1,
+      id: 'uuid',
       title: '기본 섹션',
       color: null,
       position: 0,
@@ -149,7 +149,7 @@ describe('ProjectService', () => {
       .spyOn(service, 'findSection')
       .mockImplementation(() => sectionInstance);
 
-    expect(await service.updateSection(user, testProject.id, 1, dto)).toBe(
+    expect(await service.updateSection(user, testProject.id, 'uuid', dto)).toBe(
       updatedSection,
     );
   });
@@ -163,7 +163,7 @@ describe('ProjectService', () => {
       .mockImplementation(() => sectionInstance);
 
     expect(
-      await service.removeSection(user, testProject.id, 1),
+      await service.removeSection(user, testProject.id, 'uuid'),
     ).toBeUndefined();
   });
   // it('Update positions of task in a section', async () => {

@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -20,9 +20,9 @@ import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UpdateSectionTaskPositionsDto } from './dto/update-section-task-positions.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
-import { Project } from './project.model';
+import { Project } from './models/project.model';
+import { Section } from './models/section.model';
 import { ProjectService } from './project.service';
-import { Section } from './section.model';
 
 @Controller('project')
 @UseGuards(AuthGuard('jwt'))
@@ -39,22 +39,21 @@ export class ProjectController {
   }
 
   @Get()
-  async findAll(@Req() req: Request): Promise<Project[]> {
-    return await this.projectService.findAll(req.user);
+  async findAll(@Req() req: Request) {
+    const projectInfos = await this.projectService.findAll(req.user);
+    return { projectInfos };
   }
 
   @Get(':id')
-  async findOne(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Project> {
-    return await this.projectService.findOne(req.user, id);
+  async findOne(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
+    const project = await this.projectService.findOne(req.user, id);
+    return { project };
   }
 
   @Patch(':id')
   async update(
     @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) projectData: UpdateProjectDto,
   ): Promise<Project> {
     return await this.projectService.update(req.user, id, projectData);
@@ -63,7 +62,7 @@ export class ProjectController {
   @Delete(':id')
   async remove(
     @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
     return await this.projectService.remove(req.user, id);
   }
@@ -71,7 +70,7 @@ export class ProjectController {
   @Post(':id/section')
   async addSection(
     @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) sectionData: CreateSectionDto,
   ): Promise<any> {
     return await this.projectService.addSection(req.user, id, sectionData);
@@ -80,8 +79,8 @@ export class ProjectController {
   @Patch(':projectId/section/:sectionId')
   async updateSection(
     @Req() req: Request,
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
     @Body(ValidationPipe) sectionData: UpdateSectionDto,
   ): Promise<Section> {
     return await this.projectService.updateSection(
@@ -92,11 +91,11 @@ export class ProjectController {
     );
   }
 
-  @Post(':projectId/section/:sectionId/position')
+  @Patch(':projectId/section/:sectionId/task/position')
   async updateSectionTaskPositions(
     @Req() req: Request,
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
     @Body(ValidationPipe) positionData: UpdateSectionTaskPositionsDto,
   ): Promise<void> {
     return await this.projectService.updateSectionTaskPositions(
@@ -110,8 +109,8 @@ export class ProjectController {
   @Delete(':projectId/section/:sectionId')
   async removeSection(
     @Req() req: Request,
-    @Param('projectId', ParseIntPipe) projectId: number,
-    @Param('sectionId', ParseIntPipe) sectionId: number,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('sectionId', ParseUUIDPipe) sectionId: string,
   ): Promise<void> {
     return await this.projectService.removeSection(
       req.user,

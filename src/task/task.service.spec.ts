@@ -2,28 +2,31 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 import { EntityNotFoundException } from '../common/exceptions/buisness.exception';
 import { ProjectService } from '../project/project.service';
-import { Task } from './task.model';
+import { Task } from './models/task.model';
 import { TaskService } from './task.service';
-
+import { Sequelize } from 'sequelize';
 const testTasks = [
   {
-    id: 1,
+    id: 'uuid1',
     position: 0,
   },
   {
-    id: 2,
+    id: 'uuid2',
     position: 1,
   },
 ];
 const newTask = {
-  id: 3,
+  id: 'uuid3',
   title: 'test',
   position: 2,
 };
-const testSectionInstance = {
-  $get: jest.fn(() => testTasks),
+const testSection = {
+  tasks: [
+    { id: 'uuid1', title: 'test1' },
+    { id: 'uuid2', title: 'test2' },
+  ],
 };
-const user = { id: 1 } as any;
+const user = { id: 'uuid' } as any;
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -33,9 +36,13 @@ describe('TaskService', () => {
       providers: [
         TaskService,
         {
+          provide: Sequelize,
+          useValue: {},
+        },
+        {
           provide: ProjectService,
           useValue: {
-            findSection: jest.fn(() => testSectionInstance),
+            findSection: jest.fn(() => testSection),
           },
         },
         {
@@ -59,8 +66,8 @@ describe('TaskService', () => {
   it('Create a task', async () => {
     const dto = {
       title: 'test',
-      projectId: 1,
-      sectionId: 1,
+      projectId: 'uuid',
+      sectionId: 'uuid',
     } as any;
     expect(await service.create(user, dto)).toEqual(newTask);
   });
@@ -69,7 +76,7 @@ describe('TaskService', () => {
   });
   it('Find one task by id', async () => {
     const id = testTasks[0].id;
-    const idNotExisting = 404;
+    const idNotExisting = '404';
     // id existing
     expect(await service.findOne(user, id)).toEqual(testTasks[0]);
     // id not existing

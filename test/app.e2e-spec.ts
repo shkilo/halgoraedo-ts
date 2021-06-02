@@ -1,16 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  BadRequestException,
-  HttpStatus,
-  INestApplication,
-} from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
-import { Project } from '../src/project/project.model';
-import { Section } from '../src/project/section.model';
-import { Task } from '../src/task/task.model';
 import { CreateProjectDto } from '../src/project/dto/create-project.dto';
 import { UpdateProjectDto } from '../src/project/dto/update-project.dto';
 import { CreateSectionDto } from '../src/project/dto/create-section.dto';
@@ -19,11 +12,10 @@ import { UpdateSectionDto } from '../src/project/dto/update-section.dto';
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let token: string;
-  const badToken = 'random';
+  const badToken = 'badtoken';
 
-  let testProject: Project; // assigned with first '/project/:id GET'
-  let testSection: Section; //
-  let testTasks: Task[]; //
+  let testProjectId: string; // assigned with first 'GET /project'
+  let testSectionId: string; // assigned with first 'POST /project/:projectId:section'
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -48,20 +40,39 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  // get a project
+  // get all project
   // when a user was created above, default project for the user should have been created
-  describe('/project/:id GET', () => {
-    const idFirst = 1;
-    const idNotExisting = 404;
-
-    it('should return a project', () => {
+  describe('/project GET', () => {
+    it('should return all projects', () => {
       return request(app.getHttpServer())
-        .get(`/project/${idFirst}`)
+        .get('/project')
         .set('authorization', token)
         .expect(HttpStatus.OK)
         .expect(({ body }) => {
-          expect(body.id).toBe(idFirst);
-          testProject = body;
+          const numOfProjects = body.projectInfos.length;
+          expect(numOfProjects).toBeGreaterThan(1);
+          testProjectId = body.projectInfos[numOfProjects - 1].id;
+        });
+    });
+    it('401 for a bad token', () => {
+      return request(app.getHttpServer())
+        .get('/project')
+        .set('authorization', badToken)
+        .expect(HttpStatus.UNAUTHORIZED);
+    });
+  });
+
+  // get a project
+  describe('/project/:id GET', () => {
+    const idNotExisting = 'fc97403a-7c80-448c-9acb-23e3f049a68d';
+
+    it('should return a project', () => {
+      return request(app.getHttpServer())
+        .get(`/project/${testProjectId}`)
+        .set('authorization', token)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.project.id).toBe(testProjectId);
         });
     });
     it('404 for id not existing', () => {
@@ -72,28 +83,7 @@ describe('AppController (e2e)', () => {
     });
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
-        .get(`/project/${idFirst}`)
-        .set('authorization', badToken)
-        .expect(HttpStatus.UNAUTHORIZED);
-    });
-  });
-
-  // get all project
-  describe('/project GET', () => {
-    it('should return all projects', () => {
-      return request(app.getHttpServer())
-        .get('/project')
-        .set('authorization', token)
-        .expect(HttpStatus.OK)
-        .expect((res) => {
-          expect(
-            res.body.some((project) => project.id === testProject.id),
-          ).toBeTruthy();
-        });
-    });
-    it('401 for a bad token', () => {
-      return request(app.getHttpServer())
-        .get('/project')
+        .get(`/project/${testProjectId}`)
         .set('authorization', badToken)
         .expect(HttpStatus.UNAUTHORIZED);
     });
@@ -141,11 +131,11 @@ describe('AppController (e2e)', () => {
     const dtoBadTitle = {
       title: 400,
     };
-    const idNotExisting = 404;
+    const idNotExisting = 'fc97403a-7c80-448c-9acb-23e3f049a68d';
 
     it('should update a project', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}`)
+        .patch(`/project/${testProjectId}`)
         .set('authorization', token)
         .send(dto)
         .expect(HttpStatus.OK)
@@ -155,14 +145,14 @@ describe('AppController (e2e)', () => {
     });
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}`)
+        .patch(`/project/${testProjectId}`)
         .set('authorization', token)
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}`)
+        .patch(`/project/${testProjectId}`)
         .set('authorization', badToken)
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
@@ -184,29 +174,29 @@ describe('AppController (e2e)', () => {
     const dtoBadTitle = {
       title: 400,
     };
-    const idNotExisting = 404;
+    const idNotExisting = 'fc97403a-7c80-448c-9acb-23e3f049a68d';
 
     it('should add a section to the project', () => {
       return request(app.getHttpServer())
-        .post(`/project/${testProject.id}/section`)
+        .post(`/project/${testProjectId}/section`)
         .set('authorization', token)
         .send(dto)
         .expect(HttpStatus.CREATED)
         .expect(({ body }) => {
           expect(body.title).toBe(dto.title);
-          testSection = body;
+          testSectionId = body.id;
         });
     });
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
-        .post(`/project/${testProject.id}/section`)
+        .post(`/project/${testProjectId}/section`)
         .set('authorization', token)
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
-        .post(`/project/${testProject.id}/section`)
+        .post(`/project/${testProjectId}/section`)
         .set('authorization', badToken)
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
@@ -228,11 +218,11 @@ describe('AppController (e2e)', () => {
     const dtoBadTitle = {
       title: 400,
     };
-    const sectionIdNotExisting = 404;
+    const sectionIdNotExisting = 'fc97403a-7c80-448c-9acb-23e3f049a68d';
 
     it('should update a project', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}/section/${testSection.id}`)
+        .patch(`/project/${testProjectId}/section/${testSectionId}`)
         .set('authorization', token)
         .send(dto)
         .expect(HttpStatus.OK)
@@ -242,21 +232,21 @@ describe('AppController (e2e)', () => {
     });
     it('400 for a bad request', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}/section/${testSection.id}`)
+        .patch(`/project/${testProjectId}/section/${testSectionId}`)
         .set('authorization', token)
         .send(dtoBadTitle)
         .expect(HttpStatus.BAD_REQUEST);
     });
     it('401 for a bad token', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}/section/${testSection.id}`)
+        .patch(`/project/${testProjectId}/section/${testSectionId}`)
         .set('authorization', badToken)
         .send(dto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
     it('404 for section id not existing', () => {
       return request(app.getHttpServer())
-        .patch(`/project/${testProject.id}/section/${sectionIdNotExisting}`)
+        .patch(`/project/${testProjectId}/section/${sectionIdNotExisting}`)
         .set('authorization', token)
         .send(dto)
         .expect(HttpStatus.NOT_FOUND);

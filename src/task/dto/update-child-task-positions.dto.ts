@@ -1,6 +1,6 @@
 import { IsUUID } from 'class-validator';
 
-export class UpdateSectionTaskPositionsDto {
+export class UpdateChildTaskPositionsDto {
   @IsUUID(4, { each: true })
   readonly orderedTasks: string[];
 }
