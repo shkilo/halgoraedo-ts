@@ -10,12 +10,6 @@ import { AppController } from './app.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath:
-        process.env.NODE_ENV === 'prod'
-          ? '.env.prod'
-          : process.env.NODE_ENV === 'test'
-          ? '.env.test'
-          : '.env.dev',
       isGlobal: true,
     }),
     SequelizeModule.forRoot({
