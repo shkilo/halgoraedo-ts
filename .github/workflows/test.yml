@@ -1,13 +1,11 @@
-name: ci
+name: test
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     env: 
       DB_NAME: test
@@ -25,15 +23,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
-    - run: npm ci
+    - run: npm install
     - name: Unit Tests
       run: npm run test:cov
-    - name: Codecov
+    - name: Report to Codecov
       uses: codecov/codecov-action@v1.2.2
       with:
         directory: ./coverage
-    - run: docker-compose -f docker-compose-test-db.yaml up -d
+    - run: docker-compose up -d test-mysql
     - name: E2E Tests
       run: npm test
-    - name: build
-      run: npm run build      
