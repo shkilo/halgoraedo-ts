@@ -30,6 +30,6 @@ jobs:
       uses: codecov/codecov-action@v1.2.2
       with:
         directory: ./coverage
-    - run: docker-compose up -d test-mysql
+    - run: docker-compose -f docker-compose-test-mysql up -d
     - name: E2E Tests
       run: npm test
