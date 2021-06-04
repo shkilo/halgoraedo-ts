@@ -12,6 +12,7 @@ cd /home/ec2-user/server
 echo "
 CLIENT_URL = $(aws --region=ap-northeast-2 ssm get-parameter --name 'CLIENT_URL' --query 'Parameter.Value')
 DB_HOST = $(aws --region=ap-northeast-2 ssm get-parameter --name 'DB_HOST' --query 'Parameter.Value')
+DB_PORT = $(aws --region=ap-northeast-2 ssm get-parameter --name 'DB_PORT' --query 'Parameter.Value')
 DB_NAME = $(aws --region=ap-northeast-2 ssm get-parameter --name 'DB_NAME' --query 'Parameter.Value')
 DB_PASSWORD = $(aws --region=ap-northeast-2 ssm get-parameter --name 'DB_PASSWORD' --query 'Parameter.Value')
 DB_USER = $(aws --region=ap-northeast-2 ssm get-parameter --name 'DB_USER' --query 'Parameter.Value')
