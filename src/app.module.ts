@@ -20,7 +20,6 @@ import { AppController } from './app.controller';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadModels: true,
-      // sync: { alter: true },
       synchronize: true,
     }),
     UserModule,
