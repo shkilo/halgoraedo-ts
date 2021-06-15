@@ -11,7 +11,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { NotFoundInterceptor } from '../common/interceptors/not-found.interceptor';
 import { ValidationPipe } from '../common/pipes/validation.pipe';
@@ -26,11 +25,16 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './models/task.model';
 
 import { TaskService } from './task.service';
+import { JWTAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('task')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JWTAuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
+  @Get('update')
+  async gogo() {
+    this.taskService.gogo();
+  }
 
   @Post()
   async create(

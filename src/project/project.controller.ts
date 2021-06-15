@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { JWTAuthGuard } from '../common/guards/jwt-auth.guard';
 import { NotFoundInterceptor } from '../common/interceptors/not-found.interceptor';
 import { ValidationPipe } from '../common/pipes/validation.pipe';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -25,7 +26,7 @@ import { Section } from './models/section.model';
 import { ProjectService } from './project.service';
 
 @Controller('project')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JWTAuthGuard)
 @UseInterceptors(new NotFoundInterceptor('project not found'))
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}

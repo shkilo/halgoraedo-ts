@@ -26,6 +26,37 @@ export class TaskService {
     private readonly taskModel: typeof Task,
   ) {}
 
+  async gogo() {
+    const tasks = await this.taskModel.findAll({
+      include: [
+        {
+          model: Section,
+          include: [
+            {
+              model: Project,
+              include: [
+                {
+                  model: User,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    await Promise.all(
+      tasks.map(async (task) => {
+        await task.update({
+          creatorId: task.section?.project?.creator?.id,
+        });
+      }),
+    );
+
+    const updatedTask = await this.taskModel.findAll();
+    console.log(updatedTask.map((e) => e.section).map);
+  }
+
   async create(user: User, taskData: CreateTaskDto): Promise<Task> {
     const section = await this.projectService.findSection(
       user,
