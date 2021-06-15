@@ -20,4 +20,5 @@ GOOGLE_CALLBACK_URL = $(aws --region=ap-northeast-2 ssm get-parameter --name 'GO
 GOOGLE_CLIENT_ID = $(aws --region=ap-northeast-2 ssm get-parameter --name 'GOOGLE_CLIENT_ID' --query 'Parameter.Value')
 GOOGLE_CLIENT_SECRET = $(aws --region=ap-northeast-2 ssm get-parameter --name '	GOOGLE_CLIENT_SECRET' --query 'Parameter.Value')
 JWT_SECRET = $(aws --region=ap-northeast-2 ssm get-parameter --name 'JWT_SECRET' --query 'Parameter.Value')
+SENTRY_DSN = $(aws --region=ap-northeast-2 ssm get-parameter --name 'SENTRY_DSN' --query 'Parameter.Value')
 " >> .env
