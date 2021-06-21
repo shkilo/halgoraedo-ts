@@ -1,7 +1,7 @@
 version: '3'
 services:
   server:
-    image: shkilo/halgoraedo:load-test
+    image: shkilo/halgoraedo:lt
     env_file: ./.env
     ports:
       - '3000:3000'
