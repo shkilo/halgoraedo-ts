@@ -1,8 +1,9 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { GoogleAuthGuard } from '../common/guards/google-auth.guard';
-import { getIntGenerator, intGenerator } from '../common/utils/int-generator';
+import { intGenerator } from '../common/utils/int-generator';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -16,7 +17,7 @@ export class AuthController {
   ) {}
 
   @Get('google')
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(AuthGuard('google'))
   googleAuth() {}
 
   @Get('google/callback')

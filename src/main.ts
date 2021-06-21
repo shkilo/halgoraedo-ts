@@ -8,13 +8,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(globalRoutePrefix);
 
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
-  });
-  app.useGlobalInterceptors(new SentryExceptionInterceptor());
-  app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.tracingHandler());
+  // Sentry.init({
+  //   dsn: process.env.SENTRY_DSN,
+  //   tracesSampleRate: 1.0,
+  // });
+  // app.useGlobalInterceptors(new SentryExceptionInterceptor());
+  // app.use(Sentry.Handlers.requestHandler());
+  // app.use(Sentry.Handlers.tracingHandler());
 
   await app.listen(process.env.PORT ? process.env.PORT : defaultPORT);
 }
